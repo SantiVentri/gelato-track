@@ -48,3 +48,5 @@ jobs:
       - run: npx playwright test tests/e2e/smoke.spec.ts
         env:
           BASE_URL: ${{ vars.PROD_URL }}
+          SMOKE_USER_EMAIL: ${{ secrets.SMOKE_USER_EMAIL }}
+          SMOKE_USER_PASSWORD: ${{ secrets.SMOKE_USER_PASSWORD }}
