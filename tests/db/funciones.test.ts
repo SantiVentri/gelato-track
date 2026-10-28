@@ -4,9 +4,9 @@ import { adminClient, crearUsuario } from "./helpers";
 const admin = adminClient();
 
 // Desde el SDK, cualquier error de PostgREST llega como objeto, no como excepción.
-function ok<T>(r: { data: T | null; error: { message: string } | null }): T {
+function ok<T>(r: { data: T; error: { message: string } | null }): NonNullable<T> {
   if (r.error) throw new Error(r.error.message);
-  return r.data as T;
+  return r.data as NonNullable<T>;
 }
 
 function unico(prefijo: string) {
