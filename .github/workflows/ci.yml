@@ -48,3 +48,29 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+  db:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: supabase/setup-cli@v1
+      - run: npm ci
+      - name: Levantar Supabase local
+        run: supabase start
+      - name: Aplicar migraciones
+        run: supabase db reset
+      - name: Exportar variables de Supabase local
+        run: |
+          supabase status -o env > /tmp/supabase.env
+          grep -E "^(API_URL|ANON_KEY|SERVICE_ROLE_KEY)=" /tmp/supabase.env \
+            | sed -E 's/^API_URL=/SUPABASE_URL=/; s/^ANON_KEY=/SUPABASE_ANON_KEY=/; s/^SERVICE_ROLE_KEY=/SUPABASE_SERVICE_ROLE_KEY=/' \
+            | tr -d '"' >> "$GITHUB_ENV"
+          for v in SUPABASE_URL SUPABASE_ANON_KEY SUPABASE_SERVICE_ROLE_KEY; do
+            grep -q "^$v=." "$GITHUB_ENV" || { echo "Falta $v o está vacía"; exit 1; }
+          done
+          echo "Variables exportadas: $(grep -c '^SUPABASE_' "$GITHUB_ENV")"
+      - name: Tests de base de datos
+        run: npm run test:db
