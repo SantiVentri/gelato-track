@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run tests/unit",
-    "test:db": "vitest run tests/db",
+    "test:db": "node --env-file=.env.test.local ./node_modules/vitest/vitest.mjs run tests/db",
     "test:e2e": "playwright test"
   },
   "dependencies": {
